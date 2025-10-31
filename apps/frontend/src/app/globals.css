@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens via CSS variables with auto light/dark using prefers-color-scheme */
+:root {
+	--primary: #6C5DD3;
+	--primary-light: #8E59FF;
+	--secondary: #0EAD69;
+	--bg: #0b0f19;
+	--bg-card: #121826;
+	--bg-sidebar: #0e1422;
+	--text-primary: #e5e7eb;
+	--text-secondary: #9ca3af;
+	--border-color: #1f2937;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--bg: #ffffff;
+		--bg-card: #ffffff;
+		--bg-sidebar: #ffffff;
+		--text-primary: #111827;
+		--text-secondary: #6b7280;
+		--border-color: #e5e7eb;
+	}
+}
+
+/* Utility classes aligned with Tailwind naming used in components */
+.gradient-text {
+	background-image: linear-gradient(90deg, var(--primary), var(--primary-light));
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+}
+
+.card-float {
+	background: var(--bg-card);
+	border: 1px solid var(--border-color);
+	border-radius: 16px;
+	box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
+.input-modern {
+	width: 100%;
+	padding: 0.75rem 1rem;
+	border-radius: 0.75rem;
+	border: 1px solid var(--border-color);
+	background: var(--bg-card);
+	color: var(--text-primary);
+}
+
+.btn-primary {
+	background-image: linear-gradient(90deg, var(--primary), var(--primary-light));
+	color: #fff;
+	padding: 0.6rem 1rem;
+	border-radius: 0.75rem;
+	font-weight: 700;
+}
+
+.btn-secondary {
+	background: #fff;
+	color: var(--primary);
+	border: 2px solid var(--primary);
+	padding: 0.6rem 1rem;
+	border-radius: 0.75rem;
+	font-weight: 700;
+}
+
+.skeleton {
+	background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0.12), rgba(255,255,255,0.06));
+	background-size: 200% 100%;
+	animation: skeleton-loading 1.2s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+	0% { background-position: 200% 0; }
+	100% { background-position: -200% 0; }
+}

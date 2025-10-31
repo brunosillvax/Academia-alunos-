@@ -1,0 +1,243 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+}
+
+model User {
+  id              String              @id @default(uuid())
+  name            String
+  email           String              @unique
+  password        String
+  role            Role                @default(STUDENT)
+  profile         UserProfile?
+  payments        Payment[]
+  workoutSheet    WorkoutSheet?
+  enrollments     ScheduleEnrollment[]
+  waitlists       Waitlist[]
+  habits          Habit[]
+  habitChecks     HabitCheck[]
+  evolutionPhotos EvolutionPhoto[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+}
+
+model UserProfile {
+  id              String          @id @default(uuid())
+  userId          String          @unique
+  user            User            @relation(fields: [userId], references: [id])
+  birthDate       DateTime
+  initialWeight   Float
+  currentWeight   Float
+  height          Float
+  progressEntries ProgressEntry[]
+}
+
+model ProgressEntry {
+  id         String     @id @default(uuid())
+  profileId  String
+  profile    UserProfile @relation(fields: [profileId], references: [id])
+  date       DateTime
+  weight     Float
+  bodyFat    Float?
+  measurements Json?
+}
+
+model Plan {
+  id             String  @id @default(uuid())
+  name           String
+  price          Int     // em centavos
+  durationInDays Int
+  payments       Payment[]
+}
+
+model Payment {
+  id                String         @id @default(uuid())
+  userId            String
+  user              User           @relation(fields: [userId], references: [id])
+  planId            String
+  plan              Plan           @relation(fields: [planId], references: [id])
+  status            PaymentStatus
+  amount            Int
+  paymentGatewayID  String?
+  expiresAt         DateTime
+  createdAt         DateTime       @default(now())
+}
+
+model Modality {
+  id          String     @id @default(uuid())
+  name        String
+  description String
+  icon        String     // emoji or icon name
+  color       String     // hex color
+  active      Boolean    @default(true)
+  schedules   Schedule[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Schedule {
+  id          String              @id @default(uuid())
+  modalityId  String
+  modality    Modality            @relation(fields: [modalityId], references: [id])
+  dayOfWeek   Int                 // 0-6 (domingo-sábado)
+  startTime   String              // formato HH:mm
+  endTime     String              // formato HH:mm
+  instructor  String
+  maxCapacity Int
+  active      Boolean             @default(true)
+  enrollments ScheduleEnrollment[]
+  waitlists   Waitlist[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model ScheduleEnrollment {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  date       DateTime
+  status     String   @default("CONFIRMED") // CONFIRMED, CANCELLED, ATTENDED
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, scheduleId, date])
+}
+
+model Waitlist {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  scheduleId String
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  position   Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, scheduleId])
+}
+
+model Exercise {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  videoUrl    String?
+  muscleGroup String
+  equipment   String?
+  workoutPlans WorkoutPlanExercise[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model WorkoutSheet {
+  id          String            @id @default(uuid())
+  userId      String            @unique
+  user        User              @relation(fields: [userId], references: [id])
+  workoutPlans WorkoutPlan[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model WorkoutPlan {
+  id          String                @id @default(uuid())
+  workoutSheetId String
+  workoutSheet   WorkoutSheet       @relation(fields: [workoutSheetId], references: [id])
+  name        String
+  dayOfWeek   Int?
+  exercises   WorkoutPlanExercise[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+}
+
+model WorkoutPlanExercise {
+  id              String      @id @default(uuid())
+  workoutPlanId   String
+  workoutPlan     WorkoutPlan @relation(fields: [workoutPlanId], references: [id], onDelete: Cascade)
+  exerciseId      String
+  exercise        Exercise    @relation(fields: [exerciseId], references: [id])
+  sets            Int
+  reps            String      // "10-12" ou "AMRAP"
+  weight          Float?      // em kg
+  restSeconds     Int?
+  order           Int
+  progression     Json?       // dados de progressão automática
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+}
+
+model Habit {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  name        String
+  description String?
+  streak      Int         @default(0)
+  longestStreak Int      @default(0)
+  active      Boolean     @default(true)
+  checks      HabitCheck[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model HabitCheck {
+  id        String   @id @default(uuid())
+  habitId   String
+  habit     Habit    @relation(fields: [habitId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  date      DateTime @default(now())
+  notes     String?
+  createdAt DateTime @default(now())
+
+  @@unique([habitId, date])
+}
+
+model EvolutionPhoto {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  angle     String   // "front", "side", "back"
+  url       String
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, angle, date])
+}
+
+model Campaign {
+  id          String   @id @default(uuid())
+  name        String
+  type        String   // WHATSAPP, EMAIL
+  segment     Json     // critérios de segmentação
+  message     String
+  status      String   @default("DRAFT") // DRAFT, SCHEDULED, SENT
+  sentAt      DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(uuid())
+  type      String   // CLICK_CTA, FORM_ABANDON, etc
+  page      String?
+  data      Json?
+  userId    String?
+  createdAt DateTime @default(now())
+}
