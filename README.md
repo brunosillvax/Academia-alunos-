@@ -40,7 +40,7 @@ Bem-vindo ao **GymFlow** - uma solução completa de gestão para academias que 
 
 ## 🏗️ Arquitetura do Projeto
 
-```mermaid
+```
 graph TD
     A[Frontend - Next.js] --> B[API REST - NestJS]
     B --> C[(PostgreSQL - Prisma ORM)]
@@ -189,19 +189,28 @@ O sistema utiliza Prisma como ORM com as seguintes entidades principais:
     <tr>
       <td align="center">
         <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Cloud_Logo.svg" width="50" alt="Google Cloud"><br>
-        <b>Google Calendar</b>
+        <b>Google Cloud</b>
+      </td>
+      <td align="center">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/59/Google_Cloud_Logo.svg" width="50" alt="Google Agenda"><br>
+        <b>Google Agenda</b>
       </td>
       <td align="center">
         <img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/Pagseguro.svg" width="50" alt="PagSeguro"><br>
         <b>PagSeguro</b>
       </td>
+    </tr>
+    <tr>
       <td align="center">
         <img src="https://upload.wikimedia.org/wikipedia/commons/0/09/Mercadopago.svg" width="50" alt="MercadoPago"><br>
         <b>MercadoPago</b>
       </td>
       <td align="center">
-        <img src="https://asaas.com/img/asaas-logo.svg" width="50" alt="Asaas"><br>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2cMvuaYsonUWKhGXfJkLPu4dNzCHL5785Jw&s" width="50" alt="Asaas"><br>
         <b>Asaas</b>
+      </td>
+      <td align="center">
+        <!-- Integração futura -->
       </td>
     </tr>
   </table>
